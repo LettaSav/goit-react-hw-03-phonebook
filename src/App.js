@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import React from 'react';
 
 import ContactForm from './Components/ContactForm/ContactForm';
 import Filter from './Components/Filter/Filter';
@@ -26,12 +27,20 @@ const useStyles = createUseStyles({
 function App() {
   const classes = useStyles();
 
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(() => {
+    return JSON.parse(localStorage.getItem('contacts')) ?? [];
+  });
+
+  React.useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
   const [filter, setFilter] = useState('');
 
-  const updateFilter = e => {
+  function updateFilter(e) {
     setFilter(e.currentTarget.value);
-  };
+  }
+
   const addContact = (name, number) => {
     const newContact = {
       id: uuidv4(),
@@ -50,6 +59,7 @@ function App() {
       setContacts(prevState => [newContact, ...prevState]);
     }
   };
+
   const onDelete = contactId => {
     setContacts(contacts.filter(({ id }) => id !== contactId));
   };
